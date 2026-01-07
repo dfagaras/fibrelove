@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#e07a5f">
+  <title>FibreLove 💕</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icons/icon-192.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&family=Baloo+2:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <!-- Supabase JS Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+</head>
+<body>
+  <!-- Auth Screen (shown when not logged in) -->
+  <div class="auth-container" id="auth-container">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <span class="logo-emoji">💕</span>
+        <h1>FibreLove</h1>
+        <p>Track fibre together!</p>
+      </div>
+      
+      <!-- Login Form -->
+      <form class="auth-form" id="login-form">
+        <h2>Welcome Back!</h2>
+        
+        <div class="form-group">
+          <label for="login-email">Email</label>
+          <input type="email" id="login-email" placeholder="your@email.com" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="login-password">Password</label>
+          <input type="password" id="login-password" placeholder="••••••••" required>
+        </div>
+        
+        <button type="submit" class="auth-btn primary">
+          Login 🚀
+        </button>
+        
+        <p class="auth-switch">
+          Don't have an account? 
+          <a href="#" onclick="showSignup(); return false;">Sign up</a>
+        </p>
+        
+        <div class="auth-error" id="login-error"></div>
+      </form>
+      
+      <!-- Signup Form (hidden by default) -->
+      <form class="auth-form hidden" id="signup-form">
+        <h2>Create Account</h2>
+        
+        <div class="form-group">
+          <label for="signup-name">Your Name</label>
+          <input type="text" id="signup-name" placeholder="Ana" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="signup-email">Email</label>
+          <input type="email" id="signup-email" placeholder="your@email.com" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="signup-password">Password</label>
+          <input type="password" id="signup-password" placeholder="Min 6 characters" minlength="6" required>
+        </div>
+        
+        <button type="submit" class="auth-btn primary">
+          Create Account 🌟
+        </button>
+        
+        <p class="auth-switch">
+          Already have an account? 
+          <a href="#" onclick="showLogin(); return false;">Login</a>
+        </p>
+        
+        <div class="auth-error" id="signup-error"></div>
+        <div class="auth-success hidden" id="signup-success">
+          ✅ Account created! Check your email to confirm, then login.
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Main App (hidden until logged in) -->
+  <div class="app-container hidden" id="app-container">
+    <!-- Decorative elements -->
+    <div class="floating-decor">
+      <span class="float-emoji" style="--delay: 0s; --x: 10%;">🥕</span>
+      <span class="float-emoji" style="--delay: 2s; --x: 85%;">🍎</span>
+      <span class="float-emoji" style="--delay: 4s; --x: 25%;">🥦</span>
+      <span class="float-emoji" style="--delay: 1s; --x: 70%;">🫘</span>
+      <span class="float-emoji" style="--delay: 3s; --x: 50%;">🌾</span>
+    </div>
+
+    <!-- Header -->
+    <header class="app-header">
+      <div class="logo">
+        <span class="logo-emoji">💕</span>
+        <h1>FibreLove</h1>
+      </div>
+      <p class="tagline">Tracking fibre together! 🌿</p>
+    </header>
+
+    <!-- User Display -->
+    <div class="user-display" id="user-display">
+      <div class="current-user">
+        <span class="user-icon">👤</span>
+        <span class="user-name" id="current-user-name">Loading...</span>
+      </div>
+    </div>
+
+    <!-- Main Navigation -->
+    <nav class="main-nav">
+      <button class="nav-btn active" data-view="dashboard">
+        <span class="nav-icon">📊</span>
+        <span>Today</span>
+      </button>
+      <button class="nav-btn" data-view="weekly">
+        <span class="nav-icon">📅</span>
+        <span>Week</span>
+      </button>
+      <button class="nav-btn" data-view="plan">
+        <span class="nav-icon">🛒</span>
+        <span>Plan</span>
+      </button>
+      <button class="nav-btn" data-view="settings">
+        <span class="nav-icon">⚙️</span>
+        <span>Setup</span>
+      </button>
+    </nav>
+
+    <!-- Views Container -->
+    <main class="views-container">
+      
+      <!-- Dashboard View -->
+      <section class="view active" id="dashboard-view">
+        <div class="daily-progress-card">
+          <div class="progress-header">
+            <h2>Today's Fibre Journey</h2>
+            <span class="date-display" id="today-date"></span>
+          </div>
+          <div class="progress-circle-container">
+            <svg class="progress-ring" viewBox="0 0 200 200">
+              <defs>
+                <linearGradient id="progressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" style="stop-color:#e07a5f"/>
+                  <stop offset="100%" style="stop-color:#81b29a"/>
+                </linearGradient>
+              </defs>
+              <circle class="progress-bg" cx="100" cy="100" r="85" />
+              <circle class="progress-fill" cx="100" cy="100" r="85" id="progress-circle" stroke="url(#progressGradient)" />
+            </svg>
+            <div class="progress-text">
+              <span class="progress-current" id="current-fiber">0</span>
+              <span class="progress-divider">/</span>
+              <span class="progress-goal" id="goal-fiber">35</span>
+              <span class="progress-unit">g</span>
+            </div>
+            <div class="progress-emoji" id="progress-emoji">🌱</div>
+          </div>
+          <p class="encouragement" id="encouragement-text">Let's start eating healthy! 💪</p>
+        </div>
+
+        <!-- Today's eaten foods -->
+        <div class="today-foods-section">
+          <h3>🍽️ What I Ate Today</h3>
+          <div class="today-foods-list" id="today-foods-list">
+            <p class="empty-state">No foods logged yet today.<br>Tap the button below to add what you ate! 🍽️</p>
+          </div>
+          <button class="add-food-btn" id="add-food-btn">
+            <span>➕</span> Add Food I Ate
+          </button>
+        </div>
+
+        <!-- Shopping List -->
+        <div class="shopping-list-section" id="shopping-list-section" style="display: none;">
+          <div class="shopping-list-header">
+            <h3>🛒 Shopping List <span id="shopping-people-label">(for 2 people)</span></h3>
+            <button class="email-btn" onclick="emailShoppingList()">
+              📧 Email
+            </button>
+          </div>
+          <div class="shopping-list-content" id="shopping-list-content">
+          </div>
+        </div>
+      </section>
+
+      <!-- Weekly View -->
+      <section class="view" id="weekly-view">
+        <div class="week-header">
+          <h2>📅 This Week's Progress</h2>
+          <div class="week-range" id="week-range"></div>
+        </div>
+        
+        <div class="week-overview" id="week-overview">
+        </div>
+
+        <div class="weekly-stats">
+          <div class="stat-card">
+            <span class="stat-emoji">🎯</span>
+            <span class="stat-value" id="weekly-avg">0g</span>
+            <span class="stat-label">Daily Average</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-emoji">⭐</span>
+            <span class="stat-value" id="weekly-best">0g</span>
+            <span class="stat-label">Best Day</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-emoji">🔥</span>
+            <span class="stat-value" id="weekly-streak">0</span>
+            <span class="stat-label">Days Hit Goal</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- Planning View -->
+      <section class="view" id="plan-view">
+        <div class="plan-header">
+          <h2>🛒 Create Weekly Plan</h2>
+          <p>Select foods to eat this week. We'll calculate portions and generate your shopping list!</p>
+        </div>
+
+        <div class="plan-setup" id="plan-setup">
+          <div class="plan-options">
+            <div class="items-to-select">
+              <label>Foods to include</label>
+              <div class="number-input-group">
+                <button class="num-btn minus" data-target="items-count">−</button>
+                <input type="number" id="items-count" value="15" min="5" max="40">
+                <button class="num-btn plus" data-target="items-count">+</button>
+              </div>
+            </div>
+            <div class="items-to-select">
+              <label>👥 People shopping for</label>
+              <div class="number-input-group">
+                <button class="num-btn minus" data-target="people-count">−</button>
+                <input type="number" id="people-count" value="2" min="1" max="10">
+                <button class="num-btn plus" data-target="people-count">+</button>
+              </div>
+            </div>
+          </div>
+          
+          <p class="plan-hint">🛒 Select foods you'll buy this week, then enter the total weekly amounts. We'll calculate daily fiber per person!</p>
+          
+          <div class="plan-buttons">
+            <button class="generate-btn" id="generate-plan-btn">
+              <span>🎲</span> Random Selection
+            </button>
+            <button class="clear-btn" id="clear-selection-btn">
+              <span>🗑️</span> Unselect All
+            </button>
+          </div>
+          
+          <div class="or-divider"><span>or select manually below</span></div>
+        </div>
+
+        <div class="food-categories">
+          <div class="category-tabs">
+            <button class="cat-tab active" data-category="vegetables">🥬 Legume</button>
+            <button class="cat-tab" data-category="fruits">🍎 Fructe</button>
+            <button class="cat-tab" data-category="legumes">🫘 Leguminoase</button>
+            <button class="cat-tab" data-category="nuts">🥜 Nuci</button>
+            <button class="cat-tab" data-category="wholeGrains">🌾 Cereale</button>
+          </div>
+          
+          <div class="food-grid" id="food-grid">
+          </div>
+        </div>
+
+        <div class="selection-summary" id="selection-summary">
+          <div class="summary-count">
+            <span id="selected-count">0</span> / <span id="target-count">15</span> selected
+          </div>
+          <button class="create-plan-btn" id="create-plan-btn" disabled>
+            Create Plan & Shopping List 🛒
+          </button>
+        </div>
+      </section>
+
+      <!-- Settings View -->
+      <section class="view" id="settings-view">
+        <div class="settings-card">
+          <h2>⚙️ Your Settings</h2>
+          
+          <div class="setting-group">
+            <label>
+              <span class="setting-emoji">👤</span>
+              Your Name
+            </label>
+            <input type="text" id="name1" placeholder="Your name" class="name-field full-width">
+          </div>
+
+          <div class="setting-group">
+            <label>
+              <span class="setting-emoji">🎯</span>
+              Daily Fibre Goal
+            </label>
+            <div class="number-input-group large">
+              <button class="num-btn minus" data-target="fiber-goal">−</button>
+              <input type="number" id="fiber-goal" value="35" min="20" max="60">
+              <button class="num-btn plus" data-target="fiber-goal">+</button>
+            </div>
+            <p class="setting-hint">Recommended: 25-35g for adults</p>
+          </div>
+
+          <button class="save-settings-btn" id="save-settings-btn">
+            Save Settings 💾
+          </button>
+        </div>
+
+        <div class="settings-card">
+          <h3>🔄 Data Options</h3>
+          <button class="reset-btn" id="reset-week-btn">Reset This Week's Logs</button>
+        </div>
+
+        <div class="settings-card danger-zone">
+          <h3>🚪 Account</h3>
+          <button class="reset-btn danger" id="logout-settings-btn">Logout</button>
+        </div>
+
+        <div class="app-info">
+          <p>Made with 💕 for tracking fibre together</p>
+          <p class="version">v3.0.0 - Cloud Edition</p>
+        </div>
+      </section>
+    </main>
+
+    <!-- Quick Add Modal -->
+    <div class="modal-overlay" id="quick-add-modal">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>🍽️ Add Food I Ate</h3>
+          <button class="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="search-box">
+            <input type="text" id="food-search" placeholder="Search foods...">
+          </div>
+          <div class="quick-add-list" id="quick-add-list">
+          </div>
+          <div class="portion-input" id="portion-input" style="display: none;">
+            <div class="selected-food" id="selected-food-display"></div>
+            <label>How much did you eat? (grams)</label>
+            <div class="number-input-group">
+              <button class="num-btn minus" data-target="portion-amount">−</button>
+              <input type="number" id="portion-amount" value="100" min="10" step="10">
+              <button class="num-btn plus" data-target="portion-amount">+</button>
+            </div>
+            <div class="fiber-preview">
+              = <span id="fiber-preview-value">0</span>g of fibre
+            </div>
+            <button class="confirm-add-btn" id="confirm-add-btn">Add to Today ✓</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quantity Editor Modal -->
+    <div class="modal-overlay" id="quantity-editor-modal">
+      <div class="modal large">
+        <div class="modal-header">
+          <h3>🛒 Set Weekly Shopping Amounts</h3>
+          <button class="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p class="plan-intro">Enter how much <strong>each person</strong> eats weekly. We'll multiply by <strong id="editor-people-count">2</strong> people for the shopping list!</p>
+          <div class="quantity-editor-list" id="quantity-editor-list">
+          </div>
+          <div class="quantity-summary">
+            <div class="fiber-calc">
+              <span class="fiber-label">👤 Your daily fibre:</span>
+              <strong id="calc-daily-fiber">0g</strong> <span class="fiber-goal-text">fibre (goal: <span id="calc-goal">35g</span>)</span>
+            </div>
+          </div>
+          <button class="generate-shopping-btn" id="generate-shopping-btn">
+            Save Shopping List 🛒
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Plan Result Modal -->
+    <div class="modal-overlay" id="plan-result-modal">
+      <div class="modal large">
+        <div class="modal-header">
+          <h3>🛒 Your Weekly Plan</h3>
+          <button class="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <p class="plan-intro">👤 You'll get <strong id="plan-total-fiber">0g</strong> fibre/day (goal: <strong id="plan-goal-display">35g</strong>)</p>
+          <div class="plan-result-list" id="plan-result-list">
+          </div>
+          <button class="accept-plan-btn" id="accept-plan-btn">
+            Accept Plan & Save Shopping List 💕
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <!-- Email Modal -->
+    <div class="modal-overlay" id="email-modal">
+      <div class="modal">
+        <div class="modal-header">
+          <h3>📧 Send Shopping List</h3>
+          <button class="close-modal">&times;</button>
+        </div>
+        <div class="modal-body">
+          <div class="email-input-group">
+            <label>Send to email:</label>
+            <input type="email" id="email-address" placeholder="your@email.com" class="email-input">
+          </div>
+          <button class="send-email-btn" id="send-email-btn">
+            📧 Open Email with Shopping List
+          </button>
+          <p class="email-hint">This will open your Mail app with the list ready to send!</p>
+          
+          <div class="or-divider"><span>or</span></div>
+          
+          <button class="copy-btn" id="copy-list-btn">
+            📋 Copy List to Clipboard
+          </button>
+        </div>
+      </div>
+    </div>
+
+  <script src="foods.js"></script>
+  <script src="supabase.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
