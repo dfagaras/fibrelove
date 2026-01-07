@@ -177,7 +177,7 @@
 }
 
 :root {
-  /* Warm, cozy color palette */
+  /* Warm, cozy color palette - Light Theme */
   --coral: #e07a5f;
   --coral-light: #f4a990;
   --coral-dark: #c45d42;
@@ -192,6 +192,14 @@
   --gold-light: #f7ddb0;
   --pink: #f8b4c4;
   --pink-light: #fcd5df;
+  
+  /* Theme-specific colors */
+  --bg-primary: #fef3e2;
+  --bg-secondary: #ffffff;
+  --bg-card: #ffffff;
+  --text-primary: #3d405b;
+  --text-secondary: #5d6080;
+  --border-color: #f5e6d3;
   
   /* Shadows & Effects */
   --shadow-sm: 0 2px 8px rgba(61, 64, 91, 0.08);
@@ -212,6 +220,182 @@
   --radius-md: 20px;
   --radius-lg: 28px;
   --radius-full: 50%;
+}
+
+/* Dark Theme */
+[data-theme="dark"] {
+  --coral: #e8937b;
+  --coral-light: #f4a990;
+  --coral-dark: #d4705a;
+  --cream: #1a1a2e;
+  --cream-dark: #16213e;
+  --sage: #81b29a;
+  --sage-light: #a8d5ba;
+  --sage-dark: #5a8f73;
+  --navy: #e8e8ec;
+  --navy-light: #b8b8c8;
+  --gold: #f2cc8f;
+  --gold-light: #f7ddb0;
+  --pink: #f8b4c4;
+  --pink-light: #fcd5df;
+  
+  /* Theme-specific colors */
+  --bg-primary: #0f0f1a;
+  --bg-secondary: #1a1a2e;
+  --bg-card: #1e1e32;
+  --text-primary: #e8e8ec;
+  --text-secondary: #b8b8c8;
+  --border-color: #2a2a4a;
+  
+  /* Shadows for dark mode */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 4px 20px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 8px 40px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 30px rgba(224, 122, 95, 0.4);
+}
+
+/* Dark theme specific overrides */
+[data-theme="dark"] body {
+  background: var(--bg-primary);
+}
+
+[data-theme="dark"] .app-container {
+  background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+}
+
+[data-theme="dark"] .auth-container {
+  background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+}
+
+[data-theme="dark"] .auth-card,
+[data-theme="dark"] .daily-progress-card,
+[data-theme="dark"] .settings-card,
+[data-theme="dark"] .stat-card,
+[data-theme="dark"] .modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+}
+
+[data-theme="dark"] .main-nav {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+}
+
+[data-theme="dark"] .nav-btn {
+  color: var(--text-secondary);
+}
+
+[data-theme="dark"] .nav-btn.active {
+  background: var(--coral);
+  color: white;
+}
+
+[data-theme="dark"] .food-item {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .food-item.selected {
+  background: rgba(129, 178, 154, 0.2);
+  border-color: var(--sage);
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] .form-group input {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .modal-overlay {
+  background: rgba(0, 0, 0, 0.8);
+}
+
+[data-theme="dark"] .shopping-item,
+[data-theme="dark"] .today-food-item,
+[data-theme="dark"] .day-card {
+  background: var(--bg-secondary);
+  border-color: var(--border-color);
+}
+
+/* Fix hint text visibility in dark mode */
+[data-theme="dark"] .plan-hint {
+  background: var(--bg-secondary);
+  color: var(--sage-light);
+  border: 1px solid var(--sage-dark);
+}
+
+[data-theme="dark"] .plan-setup {
+  background: var(--bg-card);
+}
+
+[data-theme="dark"] .cat-tab {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] .cat-tab.active {
+  background: var(--coral);
+  color: white;
+}
+
+[data-theme="dark"] .food-categories {
+  background: var(--bg-card);
+}
+
+[data-theme="dark"] .today-foods-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+}
+
+[data-theme="dark"] .today-foods-section h3 {
+  color: var(--text-primary);
+}
+
+[data-theme="dark"] .add-food-btn {
+  background: var(--bg-secondary);
+  border-color: var(--coral);
+  color: var(--coral-light);
+}
+
+[data-theme="dark"] .add-food-btn:hover {
+  background: var(--coral);
+  color: white;
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+  position: fixed;
+  top: var(--space-md);
+  right: var(--space-md);
+  width: 50px;
+  height: 50px;
+  border-radius: var(--radius-full);
+  border: none;
+  background: var(--bg-card);
+  box-shadow: var(--shadow-md);
+  cursor: pointer;
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 1000;
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1);
+  box-shadow: var(--shadow-lg);
+}
+
+.theme-toggle:active {
+  transform: scale(0.95);
+}
+
+[data-theme="dark"] .theme-toggle {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
 }
 
 * {

@@ -15,8 +15,15 @@
   <link rel="stylesheet" href="styles.css">
   <!-- Supabase JS Library -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.3/dist/umd/supabase.min.js"></script>
+  <!-- EmailJS Library -->
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 </head>
 <body>
+  <!-- Theme Toggle Button -->
+  <button class="theme-toggle" id="theme-toggle" onclick="toggleTheme()" title="Toggle dark mode">
+    🌙
+  </button>
+
   <!-- Auth Screen (shown when not logged in) -->
   <div class="auth-container" id="auth-container">
     <div class="auth-card">
@@ -95,7 +102,7 @@
       <span class="float-emoji" style="--delay: 0s; --x: 10%;">🥕</span>
       <span class="float-emoji" style="--delay: 2s; --x: 85%;">🍎</span>
       <span class="float-emoji" style="--delay: 4s; --x: 25%;">🥦</span>
-      <span class="float-emoji" style="--delay: 1s; --x: 70%;">🫘</span>
+      <span class="float-emoji" style="--delay: 1s; --x: 70%;">🥣</span>
       <span class="float-emoji" style="--delay: 3s; --x: 50%;">🌾</span>
     </div>
 
@@ -266,7 +273,7 @@
           <div class="category-tabs">
             <button class="cat-tab active" data-category="vegetables">🥬 Legume</button>
             <button class="cat-tab" data-category="fruits">🍎 Fructe</button>
-            <button class="cat-tab" data-category="legumes">🫘 Leguminoase</button>
+            <button class="cat-tab" data-category="legumes">🥣 Leguminoase</button>
             <button class="cat-tab" data-category="nuts">🥜 Nuci</button>
             <button class="cat-tab" data-category="wholeGrains">🌾 Cereale</button>
           </div>
@@ -419,9 +426,9 @@
             <input type="email" id="email-address" placeholder="your@email.com" class="email-input">
           </div>
           <button class="send-email-btn" id="send-email-btn">
-            📧 Open Email with Shopping List
+            📧 Send Shopping List
           </button>
-          <p class="email-hint">This will open your Mail app with the list ready to send!</p>
+          <p class="email-hint">Email will be sent directly to the address above!</p>
           
           <div class="or-divider"><span>or</span></div>
           

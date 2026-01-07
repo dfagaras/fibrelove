@@ -3,6 +3,36 @@
 // With Supabase Integration
 // ==========================================
 
+// ==========================================
+// Theme Toggle
+// ==========================================
+
+function initTheme() {
+  const savedTheme = localStorage.getItem('fibrelove-theme') || 'light';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  updateThemeIcon(savedTheme);
+}
+
+window.toggleTheme = function() {
+  const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+  const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+  
+  document.documentElement.setAttribute('data-theme', newTheme);
+  localStorage.setItem('fibrelove-theme', newTheme);
+  updateThemeIcon(newTheme);
+};
+
+function updateThemeIcon(theme) {
+  const toggleBtn = document.getElementById('theme-toggle');
+  if (toggleBtn) {
+    toggleBtn.textContent = theme === 'light' ? '🌙' : '☀️';
+    toggleBtn.title = theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode';
+  }
+}
+
+// Initialize theme immediately (before page fully loads)
+initTheme();
+
 // Global State
 const state = {
   user: null,
@@ -1208,8 +1238,9 @@ function getShoppingListText() {
   return text;
 }
 
-function sendEmailWithList() {
+async function sendEmailWithList() {
   const emailInput = document.getElementById('email-address');
+  const sendBtn = document.getElementById('send-email-btn');
   const email = emailInput.value.trim();
   
   if (!email || !email.includes('@')) {
@@ -1217,13 +1248,32 @@ function sendEmailWithList() {
     return;
   }
   
-  const subject = encodeURIComponent('🛒 Shopping List - FibreLove');
-  const body = encodeURIComponent(getShoppingListText());
+  // Show loading state
+  const originalText = sendBtn.textContent;
+  sendBtn.textContent = '📧 Sending...';
+  sendBtn.disabled = true;
   
-  window.location.href = `mailto:${email}?subject=${subject}&body=${body}`;
-  
-  closeAllModals();
-  showToast('Opening your email app... 📧');
+  try {
+    // Initialize EmailJS
+    emailjs.init('SFvNCvhmMxoGw28tR');
+    
+    // Send email via EmailJS
+    await emailjs.send('service_jgl9em5', 'template_hvti6ng', {
+      to_email: email,
+      email: email,
+      shopping_list: getShoppingListText(),
+      name: state.profile?.name || 'FibreLove User'
+    });
+    
+    closeAllModals();
+    showToast('Email sent successfully! 📧✅');
+  } catch (error) {
+    console.error('Email error:', error);
+    showToast('Failed to send email. Try again!');
+  } finally {
+    sendBtn.textContent = originalText;
+    sendBtn.disabled = false;
+  }
 }
 
 function copyListToClipboard() {
